@@ -10,3 +10,9 @@ E:\_ProgrammingProjects\Little Island Game\v1\v1\obj\Debug\v1.pdb
 E:\_ProgrammingProjects\Little Island Game\v1\v1\obj\Debug\v1.csprojResolveAssemblyReference.cache
 E:\_ProgrammingProjects\Little Island Game\v1\v1\bin\Debug\v1.exe
 E:\_ProgrammingProjects\Little Island Game\v1\v1\bin\Debug\v1.pdb
+E:\_ProgrammingProjects\Text_Adventure\v1\v1\bin\Debug\v1.exe.config
+E:\_ProgrammingProjects\Text_Adventure\v1\v1\obj\Debug\v1.exe
+E:\_ProgrammingProjects\Text_Adventure\v1\v1\obj\Debug\v1.pdb
+E:\_ProgrammingProjects\Text_Adventure\v1\v1\bin\Debug\v1.exe
+E:\_ProgrammingProjects\Text_Adventure\v1\v1\bin\Debug\v1.pdb
+E:\_ProgrammingProjects\Text_Adventure\v1\v1\obj\Debug\v1.csprojResolveAssemblyReference.cache

@@ -91,11 +91,31 @@ namespace v1
         public int hp { get; set; }
         public int energyMax { get; set; }
         public int energy { get; set; }
+        public int attMin { get; set; }
+        public int attMax { get; set; }
     }
 
     public class Enemy
     {
+        public string name { get; set; }
+        public int hpMax { get; set; }
+        public int hp { get; set; }
+        public int attMin { get; set; }
+        public int attMax { get; set; }
 
+        public static Enemy SpawnEnemy()
+        {
+            Random rand = new Random();
+            Enemy enemy = new Enemy();
+
+            enemy.name = "Clone #" + rand.Next(200);
+            enemy.hpMax = rand.Next(10, 20);
+            enemy.hp = enemy.hpMax;
+            enemy.attMin = rand.Next(1, 5);
+            enemy.attMax = enemy.attMin + 5;
+
+            return enemy;
+        }
     }
 
     public static class Game
@@ -125,10 +145,21 @@ namespace v1
             Console.Clear();
             Utility.Dialog("You open your eyes and the blue sky slowly comes into focus. Rays of sun stream down from the trees.\n");
 
-            player.hpMax = 25;
+            Game.Status();
+
+            Random rand = new Random();
+
+            player.hpMax = 60;
             player.hp = player.hpMax;
             player.energyMax = 10;
             player.energy = player.energyMax;
+            player.attMin = rand.Next(3, 8);
+            player.attMax = player.attMin + 5;
+
+            //test code start
+            Console.WriteLine(player.attMin);
+            Console.WriteLine(player.attMax);
+            //test code end
 
             player.playerItems.Add(new Item() { item = "Key", item_desc = "A dull gray key. Like most keys, there's probably a lock that it can open.\n" });
             player.playerItems.Add(new Item() { item = "Stick", item_desc = "What's brown and sticky?\n" });
@@ -281,7 +312,45 @@ namespace v1
 
         public static void Combat()
         {
+            Random rand = new Random();
+            Enemy enemy = Enemy.SpawnEnemy();
 
+            Utility.Dialog("You've encountered " + enemy.name + "! Press any key to start fight >>\n");
+            Console.ReadKey();
+
+            while (player.hp > 0 && enemy.hp > 0)
+            {
+                if (rand.NextDouble() <= 0.5)
+                {
+                    //player attacks
+                    enemy.hp -= rand.Next(player.attMin, player.attMax);
+
+                    Utility.Dialog(player.name + " attacks!"); //for ___ damage
+                    Utility.Dialog(enemy.name + " HP: " + enemy.hp + "/" + enemy.hpMax);
+                }
+                else
+                {
+                    //enemy attacks
+                    player.hp -= rand.Next(enemy.attMin, enemy.attMax);
+
+                    Utility.Dialog(enemy.name + " attacks!"); //for __ damage
+                    Utility.Dialog(player.name + " HP: " + player.hp + "/" + player.hpMax);
+                }
+            }
+
+            if (player.hp <= 0)
+            {
+                Utility.Dialog(enemy.name + " overpowered you and took all your stuff. Press any key to respawn. >>");
+                // remove all of players items, run Idle()
+
+                Console.ReadKey();
+                Utility.Dialog("You're back at camp.\n");
+                Game.Idle();
+            }
+            else if (enemy.hp <= 0)
+            {
+                Utility.Dialog("You defeated " + enemy.name + "!\n");
+            }
         }
 
 
@@ -290,6 +359,9 @@ namespace v1
             Random gen = new Random();
 
             int ticks = hours * 4;
+            int enemyCnt = 0;
+            int itemCnt = 0;
+            int locCnt = 0;
 
             double fightPerc = 0.50;
             double itemPerc = 0.20;
@@ -297,23 +369,41 @@ namespace v1
 
             //need a loop that changes percentages based on character's items equipped
 
-            for (int i = 0; i <= ticks; i++)
+            for (int i = 0; i < ticks; i++)
             {
                 //display the time, add in 15 min increments for every loop
 
 
                 //determine what encounters have a chance of happening
                 if (gen.NextDouble() <= fightPerc)
-                    Combat();
+                {
+                    Game.Combat();
+                    enemyCnt++;
+                }
                 else if (gen.NextDouble() <= itemPerc)
+                {
+                    Utility.Dialog("add item >>\n");
                     Item.AddItem();
+                    itemCnt++;
+                }
                 else if (gen.NextDouble() <= locPerc)
+                {
+                    Utility.Dialog("add location >>\n");
                     Location.AddLocation();
+                    locCnt++;
+                }
                 else
-                    Utility.Dialog("...");
+                    Utility.Dialog("nothing... >>\n");
 
-                
+                Console.ReadKey();
+                Console.WriteLine();
             }
+
+            Utility.Dialog("Trek has ended, you're back at camp. >>\n");
+            Utility.Dialog("Enemies defeated: " + enemyCnt);
+            Utility.Dialog("Items found: " + itemCnt);
+            Utility.Dialog("Locations discovered: " + locCnt);
+            Game.Status();
         }
 
 
@@ -328,7 +418,7 @@ namespace v1
         public static void ExploreIdle()
         {
             string input;
-
+            int hoursInt;
 
             input = Console.ReadLine();
             input = input.ToUpper();
@@ -374,6 +464,19 @@ namespace v1
 
                     case "EXPLORE":
                         Game.Explore();
+                        break;
+
+                    case "TREK":
+                        Utility.Dialog("How many hours do you want to explore?");
+                        string hoursString = Console.ReadLine();
+                        Int32.TryParse(hoursString, out hoursInt);
+
+                        Console.WriteLine(hoursInt);
+
+                        if (hoursInt != 0)
+                            Game.Trek(hoursInt);
+                        else
+                            Utility.Dialog("INVALID NUMBER", "red");
                         break;
 
                     default:
